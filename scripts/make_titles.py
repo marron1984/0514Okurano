@@ -43,6 +43,23 @@ def hairline(draw, cy, length=180, fill=(255, 255, 255, 200)):
     draw.rectangle([x0, cy, x0 + length, cy + 2], fill=fill)
 
 
+def draw_offset(draw, text, f, cy, offset_x=0, fill=(255, 255, 255, 255), letter_spacing=0):
+    """draw_centered と同じだが、横位置に offset_x を加える。"""
+    widths = []
+    for ch in text:
+        b = draw.textbbox((0, 0), ch, font=f)
+        widths.append(b[2] - b[0])
+    total = sum(widths) + letter_spacing * (len(text) - 1)
+    x = (W - total) // 2 + offset_x
+    bbox = draw.textbbox((0, 0), "あ", font=f)
+    th = bbox[3] - bbox[1]
+    y = cy - th // 2 - bbox[1]
+    for ch, w in zip(text, widths):
+        b = draw.textbbox((0, 0), ch, font=f)
+        draw.text((x - b[0], y), ch, font=f, fill=fill)
+        x += w + letter_spacing
+
+
 def make_title():
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
@@ -51,7 +68,7 @@ def make_title():
     f_sub = font(SERIF_REG, 44)
     draw_centered(d, "五月  月替わりコース", f_top, H // 2 - 220, letter_spacing=12)
     hairline(d, H // 2 - 130)
-    draw_centered(d, "旬を、極める。", f_main, H // 2 + 20, letter_spacing=24)
+    draw_offset(d, "旬を、極める。", f_main, H // 2 + 20, offset_x=120, letter_spacing=24)
     hairline(d, H // 2 + 130)
     draw_centered(d, "S E A S O N A L   K A I S E K I", f_sub,
                   H // 2 + 220, fill=(220, 200, 160, 230), letter_spacing=8)

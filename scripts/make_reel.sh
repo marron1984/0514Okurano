@@ -119,24 +119,22 @@ make_outro_clip () {
 }
 
 echo ">> rendering clips"
-make_text_clip "$TITLES/01_title.png"      "$CLIPS/01_title.mp4"   3.0 0.8 0.6
-make_clip      "$SRCS/chouri_a.jpg"        "$CLIPS/02_chouri_a.mp4" 2.6 in
-make_clip      "$SRCS/chouri_b.jpg"        "$CLIPS/03_chouri_b.mp4" 2.6 panU
-make_text_clip "$TITLES/04_cap_chouri.png" "$CLIPS/04_cap_chouri.mp4" 1.8 0.4 0.4
-make_clip      "$SRCS/chouri_c.jpg"        "$CLIPS/05_chouri_c.mp4" 2.6 panR
-make_clip      "$SRCS/chouri_d.jpg"        "$CLIPS/06_chouri_d.mp4" 2.6 in
-make_text_clip "$TITLES/02_cap_shun.png"   "$CLIPS/07_cap_shun.mp4" 2.0 0.4 0.4
-make_text_clip "$TITLES/03_cap_zukuri.png" "$CLIPS/08_cap_zukuri.mp4" 1.8 0.4 0.4
-make_clip      "$SRCS/zukuri_a.jpg"        "$CLIPS/09_zukuri_a.mp4" 2.6 in
-make_clip      "$SRCS/zukuri_b.jpg"        "$CLIPS/10_zukuri_b.mp4" 2.6 out
-make_clip      "$SRCS/zukuri_c.jpg"        "$CLIPS/11_zukuri_c.mp4" 2.6 panD
-make_outro_clip 4.0                        "$CLIPS/12_outro.mp4"
+# 各カット +2秒。テロップ「仕込み」「旬の鮮魚を…」「造里」のシーンは削除。
+make_text_clip "$TITLES/01_title.png"      "$CLIPS/01_title.mp4"   5.0 0.8 0.8
+make_clip      "$SRCS/chouri_a.jpg"        "$CLIPS/02_chouri_a.mp4" 4.6 in
+make_clip      "$SRCS/chouri_b.jpg"        "$CLIPS/03_chouri_b.mp4" 4.6 panU
+make_clip      "$SRCS/chouri_c.jpg"        "$CLIPS/05_chouri_c.mp4" 4.6 panR
+make_clip      "$SRCS/chouri_d.jpg"        "$CLIPS/06_chouri_d.mp4" 4.6 in
+make_clip      "$SRCS/zukuri_a.jpg"        "$CLIPS/09_zukuri_a.mp4" 4.6 in
+make_clip      "$SRCS/zukuri_b.jpg"        "$CLIPS/10_zukuri_b.mp4" 4.6 out
+make_clip      "$SRCS/zukuri_c.jpg"        "$CLIPS/11_zukuri_c.mp4" 4.6 panD
+make_outro_clip 6.0                        "$CLIPS/12_outro.mp4"
 
 # Concat list
 LIST="$BUILD/concat.txt"
 : > "$LIST"
-for f in 01_title 02_chouri_a 03_chouri_b 04_cap_chouri 05_chouri_c 06_chouri_d \
-         07_cap_shun 08_cap_zukuri 09_zukuri_a 10_zukuri_b 11_zukuri_c 12_outro; do
+for f in 01_title 02_chouri_a 03_chouri_b 05_chouri_c 06_chouri_d \
+         09_zukuri_a 10_zukuri_b 11_zukuri_c 12_outro; do
   echo "file '$CLIPS/${f}.mp4'" >> "$LIST"
 done
 
@@ -150,28 +148,16 @@ ffmpeg -y -loglevel error -f concat -safe 0 -i "$LIST" \
 TOTAL=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$BUILD/video_only.mp4")
 echo ">> video duration: ${TOTAL}s; building BGM"
 
-# Ambient bed: low drone + slow detuned pad + sparse bell hits.
-# All synthesized with ffmpeg's lavfi sources (no external assets required).
+# Use the repository's MP3 as BGM, looped to the video length with fade in/out.
+BGM_SRC="$ROOT/Porcelain_and_Pine.mp3"
+FADE_OUT_START=$(awk -v t="$TOTAL" 'BEGIN{printf "%.3f", t-1.5}')
 ffmpeg -y -loglevel error \
-  -f lavfi -i "sine=frequency=110:sample_rate=48000" \
-  -f lavfi -i "sine=frequency=164.81:sample_rate=48000" \
-  -f lavfi -i "sine=frequency=220:sample_rate=48000" \
-  -f lavfi -i "sine=frequency=329.63:sample_rate=48000" \
-  -f lavfi -i "sine=frequency=440:sample_rate=48000" \
-  -f lavfi -i "anoisesrc=color=brown:amplitude=0.04:sample_rate=48000" \
+  -stream_loop -1 -i "$BGM_SRC" \
   -filter_complex "
-    [0:a]volume=0.18,tremolo=f=0.15:d=0.25[d1];
-    [1:a]volume=0.10,tremolo=f=0.18:d=0.30[d2];
-    [2:a]volume=0.07,tremolo=f=0.22:d=0.35[d3];
-    [3:a]volume=0.05,tremolo=f=0.27:d=0.40[d4];
-    [4:a]volume=0.04,tremolo=f=0.33:d=0.50[d5];
-    [5:a]volume=0.6,highpass=f=120,lowpass=f=2400[air];
-    [d1][d2][d3][d4][d5][air]amix=inputs=6:normalize=0[mix];
-    [mix]highpass=f=60,lowpass=f=6500,
-         acompressor=threshold=-18dB:ratio=3:attack=20:release=250,
+    [0:a]aresample=48000,
          volume=0.85,
          afade=t=in:st=0:d=1.2,
-         afade=t=out:st=$(awk -v t="$TOTAL" 'BEGIN{printf "%.3f", t-1.5}'):d=1.5
+         afade=t=out:st=${FADE_OUT_START}:d=1.5
   " \
   -t "$TOTAL" -ac 2 -c:a aac -b:a 192k "$BUILD/bgm.m4a"
 
