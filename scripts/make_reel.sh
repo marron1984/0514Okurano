@@ -133,8 +133,10 @@ make_outro_clip 6.0                        "$CLIPS/12_outro.mp4"
 # Concat list
 LIST="$BUILD/concat.txt"
 : > "$LIST"
+# Order: 仕込み（最後の chouri_c/d でキュウリ船にウニを盛る）→ 完成形のウニ盛り
+# (zukuri_c) → カニ甲羅 (zukuri_a → zukuri_b) でストーリーを繋ぐ。
 for f in 01_title 02_chouri_a 03_chouri_b 05_chouri_c 06_chouri_d \
-         09_zukuri_a 10_zukuri_b 11_zukuri_c 12_outro; do
+         11_zukuri_c 09_zukuri_a 10_zukuri_b 12_outro; do
   echo "file '$CLIPS/${f}.mp4'" >> "$LIST"
 done
 
