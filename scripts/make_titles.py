@@ -64,7 +64,7 @@ def make_title():
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     f_top = font(SERIF_REG, 56)
-    f_main = font(SERIF_BOLD, 96)
+    f_main = font(SERIF_BOLD, 80)
     f_sub = font(SERIF_REG, 44)
     draw_centered(d, "五月  月替わりコース", f_top, H // 2 - 220, letter_spacing=12)
     hairline(d, H // 2 - 130)
