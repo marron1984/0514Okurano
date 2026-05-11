@@ -91,16 +91,12 @@ def make_caption(filename: str, lines: list[tuple[str, int, str]]):
 def make_outro():
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    f_jp = font(SERIF_BOLD, 88)
+    f_jp = font(SERIF_BOLD, 78)
     f_sub = font(SERIF_REG, 40)
-    f_small = font(SERIF_REG, 36)
-    draw_centered(d, "ご予約はこちらから", f_jp, 240, letter_spacing=14)
+    draw_centered(d, "ご予約は下記QRコードより", f_jp, 240, letter_spacing=10)
     hairline(d, 320, length=220)
     draw_centered(d, "R E S E R V A T I O N", f_sub, 380,
                   fill=(220, 200, 160, 230), letter_spacing=10)
-    draw_centered(d, "プロフィールのリンク、または下記QRより", f_small,
-                  H - 220, fill=(240, 235, 225, 230), letter_spacing=4)
-    draw_centered(d, "@ookurano", f_jp, H - 120, letter_spacing=10)
     img.save(BUILD / "99_outro.png")
 
 
@@ -111,7 +107,7 @@ def make_brand_lower():
     f = font(SERIF_BOLD, 40)
     f_en = font(SERIF_REG, 24)
     d.text((60, 60), "大嵓埜", font=f, fill=(255, 255, 255, 230))
-    d.text((62, 116), "O O K U R A N O", font=f_en, fill=(220, 200, 160, 220))
+    d.text((62, 116), "O K U R A N O", font=f_en, fill=(220, 200, 160, 220))
     img.save(BUILD / "brand.png")
 
 

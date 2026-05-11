@@ -107,8 +107,8 @@ make_outro_clip () {
     -loop 1 -t "$DUR" -i "$TITLES/99_outro.png" \
     -loop 1 -t "$DUR" -i "$TITLES/brand.png" \
     -filter_complex "
-      [1:v]scale=720:-1[qr];
-      [0:v][qr]overlay=(W-w)/2:(H-h)/2+60[bgqr];
+      [1:v]scale=960:-1[qr];
+      [0:v][qr]overlay=(W-w)/2:(H-h)/2+120[bgqr];
       [bgqr][2:v]overlay=0:0[bgqrt];
       [bgqrt][3:v]overlay=0:0,
         fade=t=in:st=0:d=0.6,
