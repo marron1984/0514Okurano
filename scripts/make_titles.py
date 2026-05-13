@@ -93,7 +93,7 @@ def make_outro():
     d = ImageDraw.Draw(img)
     f_jp = font(SERIF_BOLD, 78)
     f_sub = font(SERIF_REG, 40)
-    draw_centered(d, "ご予約は下記QRコードより", f_jp, 240, letter_spacing=10)
+    draw_centered(d, "ご予約は下記QRより", f_jp, 240, letter_spacing=10)
     hairline(d, 320, length=220)
     draw_centered(d, "R E S E R V A T I O N", f_sub, 380,
                   fill=(220, 200, 160, 230), letter_spacing=10)
